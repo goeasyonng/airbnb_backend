@@ -15,10 +15,11 @@ class Experience(CommonModel):
     description = models.TextField()
     perks = models.ManyToManyField("experiences.Perk",)
     
+        
 class Perk(CommonModel):
     
     """What is included on an Experience"""
-    
+        
     name=models.CharField(max_length=250,)
     details=models.CharField(max_length=250)
     explanation = models.TextField()
