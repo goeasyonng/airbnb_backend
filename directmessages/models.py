@@ -11,4 +11,4 @@ class Message(CommonModel):
     
     text = models.TextField()
     user = models.ForeignKey("users.User", null=True, blank=True, on_delete=models.SET_NULL)
-    room = models.ForeignKey("directmessage.ChattingRoom", on_delete=models.CASCADE)
+    room = models.ForeignKey("directmessages.ChattingRoom", on_delete=models.CASCADE)

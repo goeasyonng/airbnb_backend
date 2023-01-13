@@ -3,7 +3,7 @@ from .models import Room, Amenity
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ("name", "price", "kind", "owner","created_at","updated_at",)
+    list_display = ("name", "price", "kind", "total_amenities", "owner","created_at","updated_at",)
     list_filter = ("country","city","rooms","toilets","pet_friendly","kind","amenities","created_at","updated_at",)
     
 @admin.register(Amenity)
