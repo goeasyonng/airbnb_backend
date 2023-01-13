@@ -25,6 +25,10 @@ class Room(CommonModel):
     def __str__ (this):
         return this.name
     
+    def total_amenities(this):
+        print(this.amenities.all())
+        return this.amenities.count()
+    
 class Amenity(CommonModel):
     """Amenity Definition"""
     name = models.CharField(max_length=150)
@@ -35,3 +39,5 @@ class Amenity(CommonModel):
     
     class Meta:
         verbose_name_plural="Amenities"
+        
+    
