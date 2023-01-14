@@ -29,6 +29,9 @@ class Room(CommonModel):
         print(this.amenities.all())
         return this.amenities.count()
     
+    def rating(room):
+         
+    
 class Amenity(CommonModel):
     """Amenity Definition"""
     name = models.CharField(max_length=150)

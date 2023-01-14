@@ -15,6 +15,9 @@ class Experience(CommonModel):
     description = models.TextField()
     perks = models.ManyToManyField("experiences.Perk",)
     
+    def __str__(self):
+        return self.name
+    
         
 class Perk(CommonModel):
     
@@ -24,3 +27,7 @@ class Perk(CommonModel):
     details=models.CharField(max_length=250)
     explanation = models.TextField()
     
+        
+    def __str__(self):
+        return self.name
+         
