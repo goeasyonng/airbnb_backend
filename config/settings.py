@@ -34,11 +34,13 @@ CUSTOM_APPS = [
     "users.apps.UsersConfig",
     "rooms.apps.RoomsConfig",
     "experiences.apps.ExperiencesConfig",
+    "categories.apps.CategoriesConfig",
     "reviews.apps.ReviewsConfig",
     "wishlists.apps.WishlistsConfig",
     "bookings.apps.BookingsConfig",
     "medias.apps.MediasConfig",
-    "directmessages.apps.DirectmessagesConfig"
+    "directmessages.apps.DirectmessagesConfig",
+    
 ]
 SYSTEM_APPS = [
     'django.contrib.admin',

@@ -10,10 +10,11 @@ class Experience(CommonModel):
     host = models.ForeignKey("users.User", on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
     address = models.CharField(max_length=250)
-    start_at=models.TimeField()
+    start=models.TimeField()
     end = models.TimeField()
     description = models.TextField()
     perks = models.ManyToManyField("experiences.Perk",)
+    category=models.ForeignKey("categories.Category", on_delete=models.SET_NULL, null=True, blank=True,)
     
     def __str__(self):
         return self.name
