@@ -10,7 +10,9 @@ class WordFilter(admin.SimpleListFilter):
         return [("good","Good"),("great","Great"),("awesome","Awesome"),]
     
     def queryset(self, request, reviews):
+        # print(self.value())
         word = self.value()
+        # return reviews.filter(payload__contains=word)
         if word:
             return reviews.filter(payload__contains=word)
         else:
