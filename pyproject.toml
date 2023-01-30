@@ -12,6 +12,9 @@ django = "^4.1.5"
 djangorestframework = "^3.14.0"
 
 
+[tool.poetry.group.dev.dependencies]
+black = {version = "^23.1a1", allow-prereleases = true}
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
