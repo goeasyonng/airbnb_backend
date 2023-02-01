@@ -1,0 +1,14 @@
+  {
+        "name": "House3",
+        "country": "한국",
+        "city": "서울",
+        "price": 1000,
+        "rooms": 2,
+        "toilets": 2,
+        "description": "Room owner, amenities, categories",
+        "address": "123",
+        "pet_friendly": true,
+        "category":3,
+        "amenities": [1,2],
+        "kind": "private_room"
+    }
