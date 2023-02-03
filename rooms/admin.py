@@ -15,6 +15,7 @@ class RoomAdmin(admin.ModelAdmin):
     actions = (reset_prices,)
 
     list_display = (
+        "pk",
         "name",
         "price",
         "kind",
@@ -23,6 +24,7 @@ class RoomAdmin(admin.ModelAdmin):
         "owner",
         "created_at",
         "updated_at",
+        "category",
     )
     list_filter = (
         "country",

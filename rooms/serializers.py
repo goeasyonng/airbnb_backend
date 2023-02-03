@@ -2,6 +2,7 @@ from rest_framework.serializers import ModelSerializer
 from .models import Amenity, Room
 from users.serializers import TinyUserSerializer
 from categories.serializers import CategorySerializer
+from rest_framework import serializers
 
 
 class AmenitySerializer(ModelSerializer):
@@ -19,9 +20,14 @@ class RoomDetailSerializer(ModelSerializer):
     amenities = AmenitySerializer(read_only=True, many=True)
     category = CategorySerializer(read_only=True)
 
+    rating = serializers.SerializerMethodField()
+
     class Meta:
         model = Room
         fields = "__all__"
+
+    def get_rating(self, room):
+        return room.rating()
 
     # def create(self, validated_data):
     #     print(validated_data)
@@ -29,6 +35,9 @@ class RoomDetailSerializer(ModelSerializer):
 
 
 class RoomListSeializer(ModelSerializer):
+
+    rating = serializers.SerializerMethodField()
+
     class Meta:
         model = Room
         # fields = "__all__"
@@ -38,5 +47,9 @@ class RoomListSeializer(ModelSerializer):
             "country",
             "city",
             "price",
+            "rating",
         )
         # depth = 1  # 해당 id값을 가진 모델의 속성들이 나타난다(관계성을 확장한다), 커스텀이 불가하다
+
+    def get_rating(self, room):
+        return room.rating()
