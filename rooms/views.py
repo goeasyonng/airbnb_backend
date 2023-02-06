@@ -24,6 +24,7 @@ from .serializers import (
     RoomListSeializer,
     RoomDetailSerializer,
 )
+from reviews.serializers import ReviewSerializer
 
 
 class Amenities(APIView):
@@ -69,40 +70,46 @@ class AmenityDetail(APIView):
 class Rooms(APIView):
     def get(self, request):
         all_rooms = Room.objects.all()
-        serializer = RoomListSeializer(all_rooms, many=True)
+        serializer = RoomListSeializer(
+            all_rooms,
+            many=True,
+            context={"request": request},
+        )
         return Response(serializer.data)
 
     def post(self, request):
         if request.user.is_authenticated:
-            serializer = RoomDetailSerializer(data=request.data)
-            if serializer.is_valid():
-                category_pk = request.data.get("category")
-                if not category_pk:
+            serializer = RoomDetailSerializer(
+                data=request.data,
+            )
+            if serializer.is_valid():  # 유효한 값인지 검사
+                category_pk = request.data.get("category")  # 유저에게서 받은 카테고리의 아이디 값
+                if not category_pk:  # 카테고리의 아이디값 없다면
                     raise ParseError("Category is requires")
                 try:
                     category = Category.objects.get(pk=category_pk)
-                    if category.kind == Category.CategoryKindChoices.EXPERIENCES:
+                    if (
+                        category.kind == Category.CategoryKindChoices.EXPERIENCES
+                    ):  # 유저에게 받은 카테고리의 kind가 experience라면
                         raise ParseError("THe category kind should be 'rooms'")
-                except Category.DoesNotExist:
+                except Category.DoesNotExist:  # 카테고리 아이디가 기존에 없는 값이라면
                     raise ParseError("Category not found")
                 try:
                     with transaction.atomic():
                         room = serializer.save(
                             owner=request.user,
-                            category=category,
                         )  # transaction.atomic이 없을 때 코드를 실행할 때마다 쿼리가 즉시 데이터베이스에 반영되었다.
+                        room.category = category
                         amenities = request.data.get("amenities")
                         for amenity_pk in amenities:
-                            # try:
                             amenity = Amenity.objects.get(pk=amenity_pk)
                             room.amenities.add(amenity)
-                            # except Amenity.DoesNotExist:
-                            #     room.delete()
-                            #     raise ParseError(f"Amenity with id {amenity_pk} not found")
-                            # room.delete()
-                        serializer = RoomDetailSerializer(room)
+                        serializer = RoomDetailSerializer(
+                            room,
+                            context={"request": request},
+                        )
                         return Response(serializer.data)
-                except Exception:
+                except Amenity.DoesNotExist:
                     raise ParseError("Amenity not found")
             else:
                 return Response(serializer.errors)
@@ -119,7 +126,10 @@ class RoomDetail(APIView):
 
     def get(self, request, pk):
         room = self.get_object(pk)
-        serializer = RoomDetailSerializer(room)
+        serializer = RoomDetailSerializer(
+            room,
+            context={"request": request},
+        )
         return Response(serializer.data)
 
     def put(self, request, pk):
@@ -130,46 +140,52 @@ class RoomDetail(APIView):
             raise PermissionDenied
         # 업데이트시키기
         serializer = RoomDetailSerializer(room, data=request.data, partial=True)
+
         if serializer.is_valid():  # 만약에 유저에게서 받은 값이 유효하다면
-            price, rooms, toilets = (  # 다음의 변수들
-                request.data.get("price"),  # 유저에게서 받은 데이터를 get로 쿼리를 가져와라
-                request.data.get("rooms"),
-                request.data.get("toilets"),
-            )
-            if price:  # 예외처리문으로 해당 값이 음수라면 에러를 띄우는 조건문
-                if price < 0:
-                    raise ParseError("price 가 음수입니다.")
-            if rooms:
-                if rooms < 0:
-                    raise ParseError("rooms 가 음수입니다.")
-            if toilets:
-                if toilets < 0:
-                    raise ParseError("toileds 가 음수입니다.")
+            with transaction.atomic():
+                price, rooms, toilets = (  # 다음의 변수들
+                    request.data.get("price"),  # 유저에게서 받은 데이터를 get로 쿼리를 가져와라
+                    request.data.get("rooms"),
+                    request.data.get("toilets"),
+                )
+                if price:  # 예외처리문으로 해당 값이 음수라면 에러를 띄우는 조건문
+                    if price < 0:
+                        raise ParseError("price 가 음수입니다.")
+                if rooms:
+                    if rooms < 0:
+                        raise ParseError("rooms 가 음수입니다.")
+                if toilets:
+                    if toilets < 0:
+                        raise ParseError("toileds 가 음수입니다.")
 
-            amenities_pk, category_pk = request.data.get("amenities"), request.data.get(
-                "category"
-            )
-            if amenities_pk:  # 어메니티의 아이디값을 받는다면
-                if not isinstance(amenities_pk, list):
-                    raise ParseError("리스트가 아니자나~")
-                # 리스트로 받은 pk값이 유효하지 않을 떄
-                room.amenities.clear()
-                for pk in amenities_pk:
+                category_pk = request.data.get("category")
+
+                if category_pk:  # 카테고리의 아이디값을 받는다면
                     try:
-                        amenity = Amenity.objects.get(pk=pk)
-                    except Amenity.DoesNotExist:
-                        raise ParseError("해당 아이디값은 없자나~")
-                    room.amenities.add(amenity)
+                        category = Category.objects.get(pk=category_pk)
+                    except Category.DoesNotExist:
+                        raise ParseError("카테고리 값이 없자나~")
+                    if category.kind == Category.CategoryKindChoices.EXPERIENCES:
+                        raise ParseError("'rooms'가 아니자나~ ")
+                    room.category = category
 
-            if category_pk:  # 카테고리의 아이디값을 받는다면
-                try:
-                    category = Category.objects.get(pk=category_pk)
-                except Category.DoesNotExist:
-                    raise ParseError("카테고리 값이 없자나~")
-                if category.kind == Category.CategoryKindChoices.EXPERIENCES:
-                    raise ParseError("'rooms'가 아니자나~ ")
-                room.category = category
-            updated_room = serializer.save()
+                amenities_pk = request.data.get("amenities")
+
+                if amenities_pk:  # 어메니티의 아이디값을 받는다면
+                    if not isinstance(amenities_pk, list):
+                        raise ParseError("리스트가 아니자나~")
+                        # 리스트로 받은 pk값이 유효하지 않을 떄
+                    room.amenities.clear()
+                    for pk in amenities_pk:
+                        try:
+                            amenity = Amenity.objects.get(pk=pk)
+                        except Amenity.DoesNotExist:
+                            raise ParseError("해당 아이디값은 없자나~")
+                        room.amenities.add(amenity)
+
+            updated_room = serializer.save(
+                context={"request": request},
+            )
             return Response(
                 RoomDetailSerializer(updated_room).data,
             )
@@ -184,3 +200,25 @@ class RoomDetail(APIView):
             raise PermissionDenied
         room.delete()
         return Response(status=HTTP_204_NO_CONTENT)
+
+
+class RoomReviews(APIView):
+    def get_object(self, pk):
+        try:
+            return Room.objects.get(pk=pk)
+        except Room.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, pk):
+        room = self.get_object(pk)
+        serializer = ReviewSerializer(
+            room.reviews.all(),
+            many=True,
+        )
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        pass
+
+    def delete(self, request, pk):
+        pass
