@@ -1,9 +1,16 @@
 from django.db import models
-from common.models import CommonModel 
+from common.models import CommonModel
+
 
 class Wishlist(CommonModel):
     """Wishlist Model Definition"""
-    
-    name=models.CharField(max_length=150)
-    experience=models.ManyToManyField("experiences.Experience",)
-    user=models.ForeignKey("users.User", on_delete=models.CASCADE,)
+
+    name = models.CharField(max_length=150)
+    rooms = models.ManyToManyField("rooms.Room", blank=True, related_name="wishlist")
+    experience = models.ManyToManyField(
+        "experiences.Experience",
+    )
+    user = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+    )

@@ -57,7 +57,6 @@ class RoomListSeializer(ModelSerializer):
 
     class Meta:
         model = Room
-        # fields = "__all__"
         fields = (
             "pk",
             "name",
