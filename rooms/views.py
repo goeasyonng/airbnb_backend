@@ -1,5 +1,9 @@
 from django.conf import settings
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly,
+)  # get는 모두 통과하게 해주고 나머지는 인증받은 사람만 통과하게 해줌
 from rest_framework.views import APIView
+from django.utils import timezone
 from django.db import transaction
 from rest_framework.status import HTTP_204_NO_CONTENT
 from rest_framework.response import Response
@@ -18,9 +22,8 @@ from .serializers import (
 )
 from reviews.serializers import ReviewSerializer
 from medias.serializers import PhotoSerializer
-from rest_framework.permissions import (
-    IsAuthenticatedOrReadOnly,
-)  # get는 모두 통과하게 해주고 나머지는 인증받은 사람만 통과하게 해줌
+from bookings.models import Booking
+from bookings.serializers import PublicBookingSerializer, CreateBookingSerializer
 
 
 class Amenities(APIView):
@@ -292,5 +295,42 @@ class RoomPhotos(APIView):
             serializer = PhotoSerializer(photo)
             return Response(serializer.data)
 
+        else:
+            return Response(serializer.errors)
+
+
+class RoomBookings(APIView):
+
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_object(self, pk):
+        try:
+            return Room.objects.get(pk=pk)
+        except Room.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, pk):
+        room = self.get_object(pk)
+        now = timezone.localtime(timezone.now()).date()  # date로 인해 datatime 에서 date로 변환
+        bookings = Booking.objects.filter(
+            room=room,
+            kind=Booking.BookingKindChoices.ROOM,
+            check_in__gt=now,  # 체크인 날짜가 지금날짜보다 큰거 찾을때
+        )
+        serializer = PublicBookingSerializer(bookings, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, pk):
+        room = self.get_object(pk)
+        serializer = CreateBookingSerializer(data=request.data)
+        if serializer.is_valid():
+            booking = serializer.save(
+                room=room,
+                user=request.user,
+                kind=Booking.BookingKindChoices.ROOM,
+            )
+            booking = serializer.save()
+            serializer = PublicBookingSerializer(booking)
+            return Response(serializer.data)
         else:
             return Response(serializer.errors)

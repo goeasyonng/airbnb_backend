@@ -5,12 +5,17 @@ from common.models import CommonModel
 class Wishlist(CommonModel):
     """Wishlist Model Definition"""
 
-    name = models.CharField(max_length=150)
-    rooms = models.ManyToManyField("rooms.Room", blank=True, related_name="wishlist")
+    name = models.CharField(
+        max_length=150,
+    )
+    room = models.ManyToManyField(
+        "rooms.Room",
+        blank=True,
+        related_name="wishlist",
+    )
     experience = models.ManyToManyField(
         "experiences.Experience",
     )
     user = models.ForeignKey(
-        "users.User",
-        on_delete=models.CASCADE,
+        "users.User", on_delete=models.CASCADE, related_name="wishlists"
     )

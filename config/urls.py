@@ -10,6 +10,7 @@ urlpatterns = [
     path("api/v1/experiences/", include("experiences.urls")),
     path("api/v1/medias/", include("medias.urls")),
     path("api/v1/wishlists/", include("wishlists.urls")),
+    path("api/v1/users/", include("users.urls")),
 ] + static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 )  # url의 앞에 기본으로 넣고 싶을 때
