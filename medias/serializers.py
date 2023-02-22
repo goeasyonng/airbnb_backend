@@ -11,5 +11,5 @@ class PhotoSerializer(ModelSerializer):
             "description",
         )
 
-    def cerate(self, validated_data):
-        return super().create(validated_data)
+    # def cerate(self, validated_data):
+    #     return super().create(validated_data)

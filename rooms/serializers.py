@@ -1,10 +1,10 @@
-from rest_framework.serializers import ModelSerializer
-from .models import Amenity, Room
+from rest_framework.serializers import ModelSerializer  # 시리얼라이즈 코드를 사용하기 위한 import
+from rest_framework import serializers
 from users.serializers import TinyUserSerializer
 from categories.serializers import CategorySerializer
 from reviews.serializers import ReviewSerializer
-from rest_framework import serializers
 from medias.serializers import PhotoSerializer
+from .models import Amenity, Room
 from wishlists.models import Wishlist
 
 

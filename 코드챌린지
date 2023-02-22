@@ -1,0 +1,23 @@
+Experiences
+
+GET POST / Experiences
+GET PUT DELETE / experiences/1
+GET /experiences/1/perks
+GET POST / perks [x]
+GET PUT DELETE perks/1 [x]
+GET POST / experiences/1/bookings
+GET PUT DELETE /experiences/1/bookings/2
+
+    {
+        "category":2,
+        "country": "한국",
+        "city": "서울",
+        "name": "서핑",
+        "price": 1000,
+        "address": "가평",
+        "start": "21:00:52",
+        "end": "21:00:54",
+        "description": "서핑 아주 재미있어요~",
+        "host": 1,
+        "perks": [3]
+    }   
