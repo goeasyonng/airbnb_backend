@@ -1,13 +1,13 @@
 Experiences
 
-GET POST / Experiences
-GET PUT DELETE / experiences/1
+GET POST / Experiences[x]
+GET PUT DELETE / experiences/1[x]
 GET /experiences/1/perks
 GET POST / perks [x]
 GET PUT DELETE perks/1 [x]
 GET POST / experiences/1/bookings
 GET PUT DELETE /experiences/1/bookings/2
-
+유저에 들어갔을떄, 유저에대한 모든 정보 데이터 보이기
     {
         "category":2,
         "country": "한국",
