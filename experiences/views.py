@@ -12,11 +12,13 @@ from rest_framework.exceptions import (
 from rest_framework.response import Response
 from categories.models import Category
 from users.models import User
+from bookings.models import Booking
 from .models import Perk, Experience
 from .serializers import (
     ExperienceDetailSerializer,
     PerkSerializer,
 )
+from bookings.serializers import PublicBookingSerializer, CreateBookingSerializer
 
 
 class Experiences(APIView):
@@ -149,9 +151,56 @@ class ExperienceDetail(APIView):
 
 
 class ExperiencePerks(APIView):
-    # experience의 디테일에 들어가, perks의 id 값을 가져오기?
-    def get(self, request):
-        serializer = PerkSerializer
+    def get_object(self, pk):  # pk로 결과를 필터링하고 쿼리셋 결과에서 객체를 뽑아 반환하는 함수다
+        try:
+            return Experience.objects.get(pk=pk)
+        except Experience.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, pk):
+        perk = self.get_object(pk)
+        serializer = PerkSerializerSerializer(
+            perk,
+            many=True,
+        )
+        return Response(serializer.data)
+
+
+class ExperienceBookings(APIView):
+
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_object(self, pk):
+        try:
+            return Experience.objects.get(pk=pk)
+        except Experience.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, pk):
+        experience = self.get_object(pk)
+        booking = Booking.objects.filter(
+            experience=experience,
+            kind=Booking.BookingKindChoices.EXPERIENCE,
+        )
+        serializer = PublicBookingSerializer(
+            booking,
+            many=True,
+        )
+        return Response(serializer.data)
+
+    def post(self, request, pk):
+        experience = self.get_object(pk)
+        serializer = CreateBookingSerializer(data=request.data)
+        if serializer.is_valid():
+            booking = serializer.save(
+                experience=experience,
+                host=request.user,
+                kind=Booking.BookingKindChoices.EXPERIENCE,
+            )
+            seriliazer = PublicBookingSerializer(booking)
+            return Response(serialzier.data)
+        else:
+            return Response(serializer.errors, status=400)
 
 
 class Perks(APIView):
