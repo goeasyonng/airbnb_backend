@@ -58,6 +58,16 @@ class PublicUser(APIView):
         return Response(serializer.data)
 
 
+class PublicUserReviews(APIView):
+    def get(self, request, username):
+        pass
+
+
+class PublicUserRooms(APIView):
+    def get(self, request, username):
+        pass
+
+
 class ChangePassword(APIView):
     permission_classes = [IsAuthenticated]
 

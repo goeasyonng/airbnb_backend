@@ -194,13 +194,60 @@ class ExperienceBookings(APIView):
         if serializer.is_valid():
             booking = serializer.save(
                 experience=experience,
-                host=request.user,
+                user=request.user,
                 kind=Booking.BookingKindChoices.EXPERIENCE,
             )
-            seriliazer = PublicBookingSerializer(booking)
+            serialzier = PublicBookingSerializer(booking)
             return Response(serialzier.data)
         else:
             return Response(serializer.errors, status=400)
+
+
+class ExperienceBookingsDetail(APIView):
+    def get_object_experience(self, experience_pk):
+        try:
+            return Experience.objects.get(pk=experience_pk)
+        except:
+            raise NotFound
+
+    def get_object_booking(self, booking_pk):
+        try:
+            return Booking.objects.get(pk=booking_pk)
+        except Booking.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, experience_pk, booking_pk):
+        experience = self.get_object_experience(experience_pk)
+        booking = self.get_object_booking(booking_pk)
+        if booking.experience != experience:
+            raise ParseError("해당 booking pk값은 해당 pk값을 가진 experience에 존재하지 않습니다.")
+        else:
+            serializer = PublicBookingSerializer(booking)
+            return Response(serializer.data)
+
+    def put(self, request, experience_pk, booking_pk):
+        experience = self.get_object_experience(experience_pk)
+        booking = self.get_object_booking(booking_pk)
+        if booking.user != request.user:
+            raise PermissionDenied
+        serializer = PublicBookingSerializer(
+            booking,
+            data=request.data,
+            partial=True,
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            raise Response(serializer.errors, status=400)
+
+    def delete(self, request, experience_pk, booking_pk):
+        experience = self.get_object_experience(experience_pk)
+        booking = self.get_object_booking(booking_pk)
+        if booking.user != request.user:
+            raise PermissionDenied
+        booking.delete()
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 class Perks(APIView):

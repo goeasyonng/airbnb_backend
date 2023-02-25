@@ -29,6 +29,7 @@ class CreateBookingSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
+        print(self)
         if data["check_out"] < data["check_in"]:
             raise serializers.ValidationError(
                 "Check-out date must be after check-in date"
