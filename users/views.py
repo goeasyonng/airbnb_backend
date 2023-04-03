@@ -1,5 +1,5 @@
 import jwt
-from django.conf import SettingsReference
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout  # 장고 인증시스템
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -147,7 +147,7 @@ class JWTLogIn(APIView):
         if user:
             token = jwt.encode(
                 {"pk": user.pk},
-                setting.SECRET_KEY,
+                settings.SECRET_KEY,
                 algorithm="HS256",
             )
             return Response({"token": token})
