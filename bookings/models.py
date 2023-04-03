@@ -7,7 +7,8 @@ class Booking(CommonModel):
     class BookingKindChoices(models.TextChoices):
         ROOM = "room", "Room"
         EXPERIENCE = "experience", "Experience"
-        
+     
+    
     kind = models.CharField(
         max_length=15,
         choices=BookingKindChoices.choices,
