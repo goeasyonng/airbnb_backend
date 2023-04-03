@@ -248,6 +248,7 @@ class RoomAmenities(APIView):
             raise NotFound
 
     def get(self, request, pk):
+        # 페이지네이션
         try:
             page = request.query_params.get("page", 1)
             page = int(page)

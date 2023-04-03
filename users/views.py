@@ -1,4 +1,6 @@
-from django.contrib.auth import authenticate, login, logout
+import jwt
+from django.conf import SettingsReference
+from django.contrib.auth import authenticate, login, logout  # 장고 인증시스템
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -37,9 +39,20 @@ class Me(APIView):
 
 class Users(APIView):
     def post(self, request):
+        username = request.data.get("username")
         password = request.data.get("password")
-        if not password:
+        if not username or password:
             raise ParseError
+        user = authenticate(
+            request,
+            username=username,
+            password=password,
+        )
+        if user:
+            login(request, user)
+            return Response({"ok": "welcome"})
+        else:
+            return Response({"error": "wrong password"})
         serializer = serializers.PrivateUserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -118,3 +131,25 @@ class LogOut(APIView):
     def post(self, request):
         logout(request)
         return Response({"ok": "bye"})
+
+
+class JWTLogIn(APIView):
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        if not username or not password:
+            raise ParseError
+        user = authenticate(
+            request,
+            username=username,
+            password=password,
+        )
+        if user:
+            token = jwt.encode(
+                {"pk": user.pk},
+                setting.SECRET_KEY,
+                algorithm="HS256",
+            )
+            return Response({"token": token})
+        else:
+            return Response({"error": "wrong password"})

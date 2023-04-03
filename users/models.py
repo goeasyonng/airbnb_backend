@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     class GenderChoices(models.TextChoices):
-        MALE = ("male", "Male")
+        MALE = ("male", "Male")  # ("실제로 입력되는 값", "화면에 표시되는 값")
         FEMALE = ("female", "Female")
 
     class LanguageChoices(models.TextChoices):

@@ -63,7 +63,7 @@ class RoomDetailSerializer(ModelSerializer):
 
 class RoomListSeializer(ModelSerializer):
 
-    rating = serializers.SerializerMethodField()
+    # rating = serializers.SerializerMethodField()
     is_owner = serializers.SerializerMethodField()
     photos = PhotoSerializer(many=True, read_only=True)
 
@@ -81,8 +81,8 @@ class RoomListSeializer(ModelSerializer):
         )
         # depth = 1  # 해당 id값을 가진 모델의 속성들이 나타난다(관계성을 확장한다), 커스텀이 불가하다
 
-    def get_rating(self, room):
-        return room.rating()
+    # def get_rating(self, room):
+    #     return room.rating()
 
     def get_is_owner(self, room):
         request = self.context["request"]
