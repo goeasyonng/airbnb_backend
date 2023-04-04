@@ -5,7 +5,7 @@ from rest_framework.permissions import (
 from rest_framework.views import APIView
 from django.utils import timezone
 from django.db import transaction
-from rest_framework.status import HTTP_204_NO_CONTENT
+from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 from rest_framework.response import Response
 from rest_framework.exceptions import (
     NotFound,
@@ -38,12 +38,15 @@ class Amenities(APIView):
     def post(self, request):
         serializer = AmenitySerializer(data=request.data)
         if serializer.is_valid():
-            amenity = serializer.save(owner=request.user)
+            amenity = serializer.save()
             return Response(
                 AmenitySerializer(amenity).data,
             )
         else:
-            return Response(serializer.errors)
+            return Response(
+                serializer.errors,
+                status=HTTP_400_BAD_REQUEST,
+            )
 
 
 class AmenityDetail(APIView):
@@ -112,7 +115,10 @@ class Rooms(APIView):
             except Amenity.DoesNotExist:
                 raise ParseError("Amenity not found")
         else:
-            return Response(serializer.errors)
+            return Response(
+                serializer.errors,
+                status=HTTP_400_BAD_REQUEST,
+            )
 
 
 class RoomDetail(APIView):
@@ -194,7 +200,10 @@ class RoomDetail(APIView):
                 ).data,
             )
         else:
-            return Response(serializer.errors)
+            return Response(
+                serializer.errors,
+                status=HTTP_400_BAD_REQUEST,
+            )
 
     def delete(self, request, pk):
         room = self.get_object(pk)
@@ -297,7 +306,10 @@ class RoomPhotos(APIView):
             return Response(serializer.data)
 
         else:
-            return Response(serializer.errors)
+            return Response(
+                serializer.errors,
+                status=HTTP_400_BAD_REQUEST,
+            )
 
 
 class RoomBookings(APIView):
@@ -334,4 +346,7 @@ class RoomBookings(APIView):
             serializer = PublicBookingSerializer(booking)
             return Response(serializer.data)
         else:
-            return Response(serializer.errors)
+            return Response(
+                serializer.errors,
+                status=HTTP_400_BAD_REQUEST,
+            )
