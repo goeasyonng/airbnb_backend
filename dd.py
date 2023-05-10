@@ -5,5 +5,3 @@ class abc:
         print(self.name)
         
     
-    
-print(abc("KIM", 12345))
