@@ -124,4 +124,7 @@ class TestRooms(APITestCase):
             self.user,
         )
 
+        
+        
+        
         response = self.client.post("/api/v1/rooms/")
