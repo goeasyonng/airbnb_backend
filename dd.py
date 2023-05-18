@@ -4,4 +4,4 @@ class abc:
     def print(self,name):
         print(self.name)
         
-    
+   
