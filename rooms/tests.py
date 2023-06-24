@@ -123,8 +123,5 @@ class TestRooms(APITestCase):
         self.client.force_login(
             self.user,
         )
-
-        
-        
         
         response = self.client.post("/api/v1/rooms/")
