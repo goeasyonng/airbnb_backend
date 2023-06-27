@@ -5,3 +5,4 @@ from django.test import TestCase
 from restframework import test
 from django import restcode
 from django import testcode
+from django.test import TestCase
