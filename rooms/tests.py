@@ -1,7 +1,7 @@
 from rest_framework.test import APITestCase
 from . import models
 from users.models import User
-
+from models import users
 
 class TestAmenities(APITestCase):
 
