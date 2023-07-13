@@ -10,7 +10,7 @@ class TestAmenities(APITestCase):
     URL = "/api/v1/rooms/amenities/"
 
     def setUp(self):
-        models.Amenity.objects.create(
+        models.Experience.objects.create(
             name=self.NAME,
             description=self.DESC,
         )
