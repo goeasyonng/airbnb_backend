@@ -7,7 +7,7 @@ class TestAmenities(APITestCase):
 
     NAME = "Amenity Test"
     DESC = "Amenity Des"
-    URL = "/api/v1/rooms/amenities/"
+    URL = "/api/v1/experiences/"
 
     def setUp(self):
         models.Experience.objects.create(
